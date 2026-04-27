@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Match Report System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .form-body {
+            padding: 40px;
+        }
+
+        .success-message {
+            display: none;
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+            color: #2e7d32;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #202124;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .required {
+            color: #d93025;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group input[type="file"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 2px solid #e8eaed;
+            margin: 32px 0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #202124;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .job-type-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .job-type-card {
+            border: 2px solid #dadce0;
+            border-radius: 8px;
+            padding: 24px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .job-type-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .job-type-card.selected {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .job-type-card input[type="radio"] {
+            display: none;
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #5f6368;
+        }
+
+        .checkmark {
+            display: none;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .job-type-card.selected .checkmark {
+            display: block;
+        }
+
+        .conditional-section {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .contact-card, .claim-card {
+            background: #f8f9fa;
+            border: 2px solid #e8eaed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .contact-field, .claim-field {
+            margin-bottom: 12px;
+        }
+
+        .contact-field label, .claim-field label {
+            display: block;
+            font-size: 13px;
+            color: #5f6368;
+            margin-bottom: 4px;
+        }
+
+        .contact-field input,
+        .contact-field select,
+        .contact-field textarea,
+        .claim-field input,
+        .claim-field select,
+        .claim-field textarea {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .add-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .add-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .job-type-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-body {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Post-Match Report System</h1>
+            <p>Event Feedback & Expense Claims</p>
+        </div>
+
+        <div class="form-body">
+            <div class="success-message" id="successMessage">
+                ✓ Report submitted successfully!
+            </div>
+
+            <form id="reportForm">
+                <!-- Job Type -->
+                <div class="form-group">
+                    <label>Job Type <span class="required">*</span></label>
+                    <div class="job-type-cards">
+                        <div class="job-type-card" onclick="selectJobType('Sports Presentation')">
+                            <input type="radio" name="job_type" value="Sports Presentation" required>
+                            <div class="card-icon">⚽</div>
+                            <div class="card-title">Sports Presentation</div>
+                            <div class="card-description">Stadium operations & match presentation</div>
+                            <div class="checkmark">✓</div>
+                        </div>
+                        <div class="job-type-card" onclick="selectJobType('Broadcast')">
+                            <input type="radio" name="job_type" value="Broadcast" required>
+                            <div class="card-icon">📹</div>
+                            <div class="card-title">Broadcast</div>
+                            <div class="card-description">TV/streaming production</div>
+                            <div class="checkmark">✓</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Reporter Info -->
+                <h2 class="section-title">Your Information</h2>
+                
+                <div class="form-group">
+                    <label>Your Name <span class="required">*</span></label>
+                    <input type="text" name="reporter_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Role <span class="required">*</span></label>
+                    <select name="role" required>
+                        <option value="">Select role</option>
+                        <option value="operator">Operator</option>
+                        <option value="camera_operator">Camera Operator</option>
+                        <option value="director">Director</option>
+                        <option value="vision_mixer">Vision Mixer</option>
+                        <option value="audio_engineer">Audio Engineer</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Event Info -->
+                <h2 class="section-title">Event Information</h2>
+                
+                <div class="form-group">
+                    <label>Event Date <span class="required">*</span></label>
+                    <input type="date" name="match_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Event Name <span class="required">*</span></label>
+                    <input type="text" name="event_name" placeholder="e.g., Arsenal vs Chelsea" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Venue <span class="required">*</span></label>
+                    <input type="text" name="venue" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Client</label>
+                    <input type="text" name="client" placeholder="e.g., Premier League, Sky Sports">
+                </div>
+
+                <!-- Broadcast Fields -->
+                <div id="broadcastFields" class="conditional-section">
+                    <div class="form-group">
+                        <label>Broadcast Type</label>
+                        <select name="broadcast_type">
+                            <option value="">Select type</option>
+                            <option value="live_tv">Live TV</option>
+                            <option value="streaming">Streaming</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Number of Cameras</label>
+                        <input type="number" name="camera_count" min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Platform</label>
+                        <input type="text" name="broadcast_platform" placeholder="e.g., Sky Sports, BT Sport">
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Performance -->
+                <h2 class="section-title">Performance Feedback</h2>
+                
+                <div class="form-group">
+                    <label>How did it go? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="match_rating" value="Bad" required>
+                            <label>Bad</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="match_rating" value="OK" required>
+                            <label>OK</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="match_rating" value="Good" required>
+                            <label>Good</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="match_rating" value="Great" required>
+                            <label>Great</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="match_rating" value="Smashed It" required>
+                            <label>Smashed It</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Details</label>
+                    <textarea name="match_details" placeholder="What went well? What could be improved?"></textarea>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Technical Notes -->
+                <h2 class="section-title">Technical Notes</h2>
+
+                <div class="form-group">
+                    <label>Equipment Problems? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="equipment_problems" value="Yes" required>
+                            <label>Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="equipment_problems" value="No" required>
+                            <label>No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="equipmentDetails" class="conditional-section">
+                    <div class="form-group">
+                        <label>Equipment Details</label>
+                        <textarea name="equipment_details"></textarea>
+                    </div>
+                </div>
+
+                <!-- Client Feedback -->
+                <div class="form-group">
+                    <label>Client Feedback? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="has_client_feedback" value="Yes" required>
+                            <label>Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="has_client_feedback" value="No" required>
+                            <label>No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="clientFeedbackSection" class="conditional-section">
+                    <div class="form-group">
+                        <label>Feedback Type</label>
+                        <select name="client_feedback_type">
+                            <option value="">Select type</option>
+                            <option value="positive">Positive</option>
+                            <option value="negative">Negative</option>
+                            <option value="mixed">Mixed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Details</label>
+                        <textarea name="client_feedback_details"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Satisfaction (1-10)</label>
+                        <input type="number" name="client_satisfaction" min="1" max="10">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Action Items</label>
+                        <textarea name="client_action_items"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>VMix Notes</label>
+                    <textarea name="vmix_notes"></textarea>
+                </div>
+
+                <!-- Sports Fields -->
+                <div id="sportsFields" class="conditional-section">
+                    <div class="form-group">
+                        <label>Stadium Notes</label>
+                        <textarea name="stadium_notes"></textarea>
+                    </div>
+                </div>
+
+                <!-- Broadcast Technical Fields -->
+                <div id="broadcastTechnicalFields" class="conditional-section">
+                    <div class="form-group">
+                        <label>Camera Notes</label>
+                        <textarea name="camera_notes"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vision Mixing Notes</label>
+                        <textarea name="vision_mixing_notes"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Audio Notes</label>
+                        <textarea name="audio_notes"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Graphics Notes</label>
+                        <textarea name="graphics_notes"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Transmission Notes</label>
+                        <textarea name="transmission_notes"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>OB Truck Notes</label>
+                        <textarea name="ob_truck_notes"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>New Knowledge</label>
+                    <textarea name="new_knowledge" placeholder="What did you learn?"></textarea>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Hotel & Travel -->
+                <h2 class="section-title">Hotel & Travel</h2>
+
+                <div class="form-group">
+                    <label>Hotel Name</label>
+                    <input type="text" name="hotel_name">
+                </div>
+
+                <div class="form-group">
+                    <label>Hotel Feedback</label>
+                    <textarea name="hotel_feedback" placeholder="Room, breakfast, facilities..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Travel Feedback</label>
+                    <textarea name="travel_feedback" placeholder="Airport, transport, parking..."></textarea>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Contacts -->
+                <h2 class="section-title">Contacts</h2>
+
+                <div class="form-group">
+                    <label>Meet anyone interesting? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="has_contacts" value="Yes" required>
+                            <label>Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="has_contacts" value="No" required>
+                            <label>No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contactsSection" class="conditional-section">
+                    <div id="contactsContainer"></div>
+                    <button type="button" class="add-btn" onclick="addContact()">➕ Add Contact</button>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Claims -->
+                <h2 class="section-title">Expense Claims</h2>
+
+                <div class="form-group">
+                    <label>Any expenses to claim? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="has_claims" value="Yes" required>
+                            <label>Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="has_claims" value="No" required>
+                            <label>No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="claimsSection" class="conditional-section">
+                    <div id="claimsContainer"></div>
+                    <button type="button" class="add-btn" onclick="addClaim()">➕ Add Expense</button>
+
+                    <div class="form-group" style="margin-top: 24px;">
+                        <label>Bank Details for Reimbursement</label>
+                        <textarea name="bank_details" placeholder="Account name, bank, account number, sort code..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes for Finance Team</label>
+                        <textarea name="claim_notes"></textarea>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Additional Comments -->
+                <div class="form-group">
+                    <label>Additional Comments</label>
+                    <textarea name="additional_comments"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGnnRCMoBH5qReCnqP3aWoQ8Nkfxh84OXCzdIE4caPY4MIT_IEitmmDGw7RP3jvhxa1Q/exec';
+        
+        let contactCounter = 0;
+        let claimCounter = 0;
+
+        // Job type selection
+        function selectJobType(type) {
+            document.querySelectorAll('.job-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            event.currentTarget.querySelector('input[type="radio"]').checked = true;
+
+            if (type === 'Sports Presentation') {
+                document.getElementById('sportsFields').style.display = 'block';
+                document.getElementById('broadcastFields').style.display = 'none';
+                document.getElementById('broadcastTechnicalFields').style.display = 'none';
+            } else {
+                document.getElementById('sportsFields').style.display = 'none';
+                document.getElementById('broadcastFields').style.display = 'block';
+                document.getElementById('broadcastTechnicalFields').style.display = 'block';
+            }
+        }
+
+        // Equipment problems toggle
+        document.querySelectorAll('input[name="equipment_problems"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('equipmentDetails').style.display = 
+                    this.value === 'Yes' ? 'block' : 'none';
+            });
+        });
+
+        // Client feedback toggle
+        document.querySelectorAll('input[name="has_client_feedback"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('clientFeedbackSection').style.display = 
+                    this.value === 'Yes' ? 'block' : 'none';
+            });
+        });
+
+        // Contacts toggle
+        document.querySelectorAll('input[name="has_contacts"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('contactsSection').style.display = 
+                    this.value === 'Yes' ? 'block' : 'none';
+            });
+        });
+
+        // Claims toggle
+        document.querySelectorAll('input[name="has_claims"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('claimsSection').style.display = 
+                    this.value === 'Yes' ? 'block' : 'none';
+            });
+        });
+
+        // Add contact
+        function addContact() {
+            const container = document.getElementById('contactsContainer');
+            const index = contactCounter++;
+            container.insertAdjacentHTML('beforeend', `
+                <div class="contact-card" data-index="${index}">
+                    <div class="card-header">
+                        <div class="card-title">Contact #${index + 1}</div>
+                        <button type="button" class="remove-btn" onclick="removeContact(${index})">Remove</button>
+                    </div>
+                    <div class="contact-field">
+                        <label>Name</label>
+                        <input type="text" name="contact_${index}_name">
+                    </div>
+                    <div class="contact-field">
+                        <label>Title</label>
+                        <input type="text" name="contact_${index}_title">
+                    </div>
+                    <div class="contact-field">
+                        <label>Company</label>
+                        <input type="text" name="contact_${index}_company">
+                    </div>
+                    <div class="contact-field">
+                        <label>Email</label>
+                        <input type="email" name="contact_${index}_email">
+                    </div>
+                    <div class="contact-field">
+                        <label>Phone</label>
+                        <input type="tel" name="contact_${index}_phone">
+                    </div>
+                    <div class="contact-field">
+                        <label>LinkedIn</label>
+                        <input type="text" name="contact_${index}_linkedin">
+                    </div>
+                    <div class="contact-field">
+                        <label>Relationship</label>
+                        <select name="contact_${index}_relationship">
+                            <option value="">Select type</option>
+                            <option value="potential_client">Potential Client</option>
+                            <option value="venue_contact">Venue Contact</option>
+                            <option value="partner">Partner</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="contact-field">
+                        <label>Why Follow Up?</label>
+                        <textarea name="contact_${index}_reason"></textarea>
+                    </div>
+                    <div class="contact-field">
+                        <label>Priority</label>
+                        <select name="contact_${index}_priority">
+                            <option value="">Select</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="contact-field">
+                        <label>Next Steps</label>
+                        <textarea name="contact_${index}_next_steps"></textarea>
+                    </div>
+                    <div class="contact-field">
+                        <label>Notes</label>
+                        <textarea name="contact_${index}_notes"></textarea>
+                    </div>
+                </div>
+            `);
+        }
+
+        function removeContact(index) {
+            document.querySelector(`[data-index="${index}"]`).remove();
+        }
+
+        // Add claim
+        function addClaim() {
+            const container = document.getElementById('claimsContainer');
+            const index = claimCounter++;
+            container.insertAdjacentHTML('beforeend', `
+                <div class="claim-card" data-claim-index="${index}">
+                    <div class="card-header">
+                        <div class="card-title">Expense #${index + 1}</div>
+                        <button type="button" class="remove-btn" onclick="removeClaim(${index})">Remove</button>
+                    </div>
+                    <div class="claim-field">
+                        <label>Category</label>
+                        <select name="claim_${index}_category">
+                            <option value="">Select category</option>
+                            <option value="travel_flight">Travel - Flight</option>
+                            <option value="travel_train">Travel - Train</option>
+                            <option value="travel_taxi">Travel - Taxi/Uber</option>
+                            <option value="travel_car">Travel - Car/Petrol</option>
+                            <option value="travel_parking">Travel - Parking</option>
+                            <option value="accommodation">Accommodation</option>
+                            <option value="meals">Meals</option>
+                            <option value="equipment">Equipment</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="claim-field">
+                        <label>Description</label>
+                        <input type="text" name="claim_${index}_description" placeholder="e.g., Uber from airport">
+                    </div>
+                    <div class="claim-field">
+                        <label>Date</label>
+                        <input type="date" name="claim_${index}_date">
+                    </div>
+                    <div class="claim-field">
+                        <label>Amount</label>
+                        <input type="number" name="claim_${index}_amount" step="0.01" min="0">
+                    </div>
+                    <div class="claim-field">
+                        <label>Currency</label>
+                        <select name="claim_${index}_currency">
+                            <option value="GBP">GBP (£)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="SGD">SGD</option>
+                            <option value="MYR">MYR</option>
+                        </select>
+                    </div>
+                    <div class="claim-field">
+                        <label>Receipts (Hold Ctrl/Cmd for multiple)</label>
+                        <input type="file" name="claim_${index}_receipt" accept="image/*,.pdf" multiple>
+                        <div class="helper-text">Upload multiple receipts/proof files</div>
+                    </div>
+                    <div class="claim-field">
+                        <label>Payment Method</label>
+                        <select name="claim_${index}_payment_method">
+                            <option value="">Select</option>
+                            <option value="cash">Cash</option>
+                            <option value="personal_card">Personal Card</option>
+                            <option value="company_card">Company Card</option>
+                        </select>
+                    </div>
+                    <div class="claim-field">
+                        <label>Notes</label>
+                        <textarea name="claim_${index}_notes"></textarea>
+                    </div>
+                </div>
+            `);
+        }
+
+        function removeClaim(index) {
+            document.querySelector(`[data-claim-index="${index}"]`).remove();
+        }
+
+        // Form submission
+        document.getElementById('reportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = this.querySelector('.submit-btn');
+            submitBtn.textContent = 'Processing files...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(this);
+            const data = {
+                job_type: formData.get('job_type'),
+                reporter: {},
+                event: {},
+                performance: {},
+                technical: {},
+                contacts: [],
+                claims: []
+            };
+
+            // Organize data
+            formData.forEach((value, key) => {
+                if (key.startsWith('contact_')) {
+                    const parts = key.split('_');
+                    const contactIndex = parseInt(parts[1]);
+                    const fieldName = parts.slice(2).join('_');
+                    
+                    if (!data.contacts[contactIndex]) {
+                        data.contacts[contactIndex] = {};
+                    }
+                    data.contacts[contactIndex][fieldName] = value;
+                } else if (key.startsWith('claim_') && !key.includes('receipt')) {
+                    const parts = key.split('_');
+                    const claimIndex = parseInt(parts[1]);
+                    const fieldName = parts.slice(2).join('_');
+                    
+                    if (!data.claims[claimIndex]) {
+                        data.claims[claimIndex] = {};
+                    }
+                    data.claims[claimIndex][fieldName] = value;
+                } else if (['reporter_name', 'role', 'email'].includes(key)) {
+                    data.reporter[key] = value;
+                } else if (['match_date', 'event_name', 'venue'].includes(key)) {
+                    data.event[key] = value;
+                } else if (['match_rating', 'match_details'].includes(key)) {
+                    data.performance[key] = value;
+                } else if (key !== 'job_type') {
+                    data.technical[key] = value;
+                }
+            });
+
+            // Process file uploads
+            const filePromises = [];
+            document.querySelectorAll('[type="file"]').forEach(fileInput => {
+                if (fileInput.files.length > 0 && fileInput.name.includes('claim')) {
+                    const match = fileInput.name.match(/claim_(\d+)_receipt/);
+                    if (match) {
+                        const claimIndex = parseInt(match[1]);
+                        
+                        if (!data.claims[claimIndex]) {
+                            data.claims[claimIndex] = {};
+                        }
+                        if (!data.claims[claimIndex].receipts) {
+                            data.claims[claimIndex].receipts = [];
+                        }
+                        
+                        Array.from(fileInput.files).forEach(file => {
+                            const promise = new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    data.claims[claimIndex].receipts.push({
+                                        base64: e.target.result.split(',')[1],
+                                        type: file.type,
+                                        extension: file.name.split('.').pop(),
+                                        name: file.name
+                                    });
+                                    resolve();
+                                };
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                            });
+                            filePromises.push(promise);
+                        });
+                    }
+                }
+            });
+
+            try {
+                await Promise.all(filePromises);
+                console.log('All files processed');
+                console.log('Claims data:', JSON.stringify(data.claims, null, 2));
+            } catch (error) {
+                console.error('File processing error:', error);
+                alert('Error processing files');
+                submitBtn.textContent = 'Submit Report';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            data.contacts = data.contacts.filter(Boolean);
+            data.claims = data.claims.filter(Boolean);
+
+            submitBtn.textContent = 'Submitting...';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    document.getElementById('successMessage').style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(result.message);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+                submitBtn.textContent = 'Submit Report';
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Set max date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelector('[name="match_date"]').setAttribute('max', today);
+    </script>
+</body>
+</html>
